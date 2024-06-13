@@ -1,0 +1,43 @@
+
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: mydatabase
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  postgresql:
+    image: postgres:13
+    container_name: postgres-container
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydatabase
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgresql-data:/var/lib/postgresql/data
+
+  # oracle:
+  #   image: store/oracle/database-enterprise:12.2.0.1-slim
+  #   container_name: oracle-container
+  #   environment:
+  #     ORACLE_PWD: password
+  #   ports:
+  #     - "1521:1521"
+  #     - "5500:5500"
+  #   volumes:
+  #     - oracle-data:/opt/oracle/oradata
+
+volumes:
+  mysql-data:
+  postgresql-data:
+  # oracle-data:

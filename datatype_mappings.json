@@ -1,0 +1,116 @@
+{
+    "data_type_mappings": {
+        "int": {
+            "mysql": "INT",
+            "postgres": "INTEGER"
+        },
+        "decimal": {
+            "mysql": "DECIMAL",
+            "postgres": "DECIMAL"
+        },
+        "float": {
+            "mysql": "FLOAT",
+            "postgres": "REAL"
+        },
+        "double": {
+            "mysql": "DOUBLE",
+            "postgres": "DOUBLE PRECISION"
+        },
+        "boolean": {
+            "mysql": "BOOLEAN",
+            "postgres": "BOOLEAN"
+        },
+        "date": {
+            "mysql": "DATE",
+            "postgres": "DATE"
+        },
+        "datetime": {
+            "mysql": "DATETIME",
+            "postgres": "TIMESTAMP"
+        },
+        "timestamp": {
+            "mysql": "TIMESTAMP",
+            "postgres": "TIMESTAMP"
+        },
+        "time": {
+            "mysql": "TIME",
+            "postgres": "TIME"
+        },
+        "char": {
+            "mysql": "CHAR",
+            "postgres": "CHARACTER"
+        },
+        "varchar": {
+            "mysql": "VARCHAR",
+            "postgres": "CHARACTER VARYING"
+        },
+        "text": {
+            "mysql": "TEXT",
+            "postgres": "TEXT"
+        },
+        "blob": {
+            "mysql": "BLOB",
+            "postgres": "BYTEA"
+        },
+        "enum": {
+            "mysql": "ENUM",
+            "postgres": "VARCHAR"
+        },
+        "set": {
+            "mysql": "SET",
+            "postgres": "VARCHAR"
+        },
+        "tinyint": {
+            "mysql": "TINYINT",
+            "postgres": "SMALLINT"
+        },
+        "smallint": {
+            "mysql": "SMALLINT",
+            "postgres": "SMALLINT"
+        },
+        "bigint": {
+            "mysql": "BIGINT",
+            "postgres": "BIGINT"
+        },
+        "numeric": {
+            "mysql": "NUMERIC",
+            "postgres": "NUMERIC"
+        },
+        "real": {
+            "mysql": "REAL",
+            "postgres": "REAL"
+        },
+        "double precision": {
+            "mysql": "DOUBLE",
+            "postgres": "DOUBLE PRECISION"
+        },
+        "year": {
+            "mysql": "YEAR",
+            "postgres": "INTEGER"
+        },
+        "binary": {
+            "mysql": "BINARY",
+            "postgres": "BYTEA"
+        },
+        "varbinary": {
+            "mysql": "VARBINARY",
+            "postgres": "BYTEA"
+        },
+        "timestamp without time zone": {
+            "mysql": "TIMESTAMP",
+            "postgres": "TIMESTAMP WITHOUT TIME ZONE"
+        },
+        "time without time zone": {
+            "mysql": "TIME",
+            "postgres": "TIME WITHOUT TIME ZONE"
+        },
+        "character varying": {
+            "mysql": "VARCHAR",
+            "postgres": "CHARACTER VARYING"
+        },
+        "bytea": {
+            "mysql": "BLOB",
+            "postgres": "BYTEA"
+        }
+    }
+}
