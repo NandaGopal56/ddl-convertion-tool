@@ -22,12 +22,15 @@ def get_connection(db_type):
     if db_type == 'mysql':
         import mysql.connector
         return mysql.connector.connect(**database_configs[db_type])
+    
     elif db_type == 'postgres':
         import psycopg2
         return psycopg2.connect(**database_configs[db_type])
+    
     elif db_type == 'oracle':
         import cx_Oracle
         return cx_Oracle.connect(**database_configs[db_type])
+    
     elif db_type == 'sqlserver':
         import pyodbc
         return pyodbc.connect(
@@ -37,6 +40,7 @@ def get_connection(db_type):
             f'UID={database_configs[db_type]["user"]};'
             f'PWD={database_configs[db_type]["password"]}'
         )
+    
     else:
         raise ValueError(f"Unsupported database type: {db_type}")
 
@@ -45,6 +49,7 @@ def get_source_ddl(conn, db_type, table_name):
         cursor = conn.cursor(dictionary=True)
         cursor.execute(f"SHOW CREATE TABLE {table_name}")
         data = cursor.fetchall()
+
     elif db_type == 'postgres':
         cursor = conn.cursor(cursor_factory=DictCursor)
         cursor.execute("""
@@ -71,6 +76,7 @@ def get_columns(conn, db_type, table_name, schema_name):
             WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s
         """, (schema_name, table_name))
         columns = cursor.fetchall()
+
     elif db_type == 'postgres':
         cursor = conn.cursor(cursor_factory=DictCursor)
         cursor.execute("""
@@ -81,8 +87,10 @@ def get_columns(conn, db_type, table_name, schema_name):
         """, (schema_name, table_name))
         columns = cursor.fetchall()
         columns = [{k.upper(): v for k, v in column.items()} for column in columns]
+
     else:
         raise ValueError(f"Unsupported database type: {db_type}")
+    
     cursor.close()
     return columns
 
