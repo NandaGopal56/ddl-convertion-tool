@@ -1,6 +1,6 @@
 {
     "data_type_mappings": {
-        "int": {
+        "integer": {
             "mysql": "INT",
             "postgres": "INTEGER"
         },
@@ -40,8 +40,8 @@
             "mysql": "CHAR",
             "postgres": "CHARACTER"
         },
-        "varchar": {
-            "mysql": "VARCHAR",
+        "character varying": {
+            "mysql": "VARCHAR(255)",
             "postgres": "CHARACTER VARYING"
         },
         "text": {
@@ -103,10 +103,6 @@
         "time without time zone": {
             "mysql": "TIME",
             "postgres": "TIME WITHOUT TIME ZONE"
-        },
-        "character varying": {
-            "mysql": "VARCHAR",
-            "postgres": "CHARACTER VARYING"
         },
         "bytea": {
             "mysql": "BLOB",

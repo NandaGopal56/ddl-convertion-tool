@@ -1,28 +1,28 @@
--- DDL for CommonDataTypes from mysql to postgres
+-- DDL for commondatatypes from mysql to postgres
 -- Source DDL (from mysql):
 None
 
 -- Target DDL (to postgres):
-CREATE TABLE CommonDataTypes (
-    col_tinyint SMALLINT DEFAULT '1'::SMALLINT NOT NULL,
-    col_smallint SMALLINT NULL,
-    col_int INTEGER NULL,
-    col_bigint BIGINT NULL,
-    col_boolean SMALLINT NULL,
-    col_decimal DECIMAL(10, 2) NULL,
-    col_float REAL NOT NULL,
-    col_double DOUBLE PRECISION NULL,
-    col_date DATE DEFAULT '2024-12-31'::DATE NULL,
-    col_datetime TIMESTAMP NULL,
-    col_timestamp TIMESTAMP NULL,
-    col_time TIME NULL,
-    col_year INTEGER NULL,
-    col_char CHARACTER DEFAULT 'NGP'::CHARACTER NULL,
-    col_varchar VARCHAR(255) DEFAULT 'GOPAL'::CHARACTER VARYING NOT NULL,
-    col_binary BYTEA NULL,
-    col_varbinary BYTEA NULL,
-    col_blob BYTEA NULL,
-    col_text TEXT NULL,
-    col_enum VARCHAR NULL,
-    col_set VARCHAR NULL
+CREATE TABLE commondatatypes_new(
+    col_tinyint SMALLINT NOT NULL,
+    col_smallint SMALLINT,
+    col_int INTEGER DEFAULT '45' NOT NULL,
+    col_bigint BIGINT,
+    col_boolean SMALLINT,
+    col_decimal DECIMAL(10, 0),
+    col_float DOUBLE PRECISION NOT NULL,
+    col_double DOUBLE PRECISION,
+    col_date DATE,
+    col_datetime TIMESTAMP DEFAULT '2024-12-31 00:00:00',
+    col_timestamp TIMESTAMP DEFAULT '2024-12-31 12:00:00',
+    col_time TIME,
+    col_year INTEGER,
+    col_char TEXT,
+    col_varchar VARCHAR(255) NOT NULL,
+    col_binary BYTEA,
+    col_varbinary BYTEA,
+    col_blob BYTEA,
+    col_text VARCHAR(255) DEFAULT 'Gopal',
+    col_enum VARCHAR(255) DEFAULT 'PwC' NOT NULL,
+    col_set VARCHAR(255)
 );

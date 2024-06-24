@@ -1,8 +1,9 @@
 import json
 from config import mysql_config, postgres_config, oracle_config, sqlserver_config, setup_logger, save_ddl_to_file
 from psycopg2.extras import DictCursor
+import logging
 
-
+logging.getLogger().addHandler(logging.StreamHandler())
 logger = setup_logger()
 
 # Load the data type mappings from the configuration file
@@ -139,7 +140,7 @@ def custom_map_data_type(source_db_type, target_db_type, mysql_type):
 def get_default_value_as_per_database_type(source_db_type, target_db_type, target_data_type, value):
     if source_db_type =='mysql':
         if target_db_type == 'postgres':
-            return_value = f"'{value}'::{target_data_type}"
+            return_value = f"'{value}'"
             logger.info(f'source is : {source_db_type}, target is {target_db_type}: returning value is {return_value}')
             return return_value
     
@@ -153,7 +154,7 @@ def get_default_value_as_per_database_type(source_db_type, target_db_type, targe
     logger.info(f'source is : {source_db_type}, target is {target_db_type}: returning value is {str(value)}')
     return str(value)
 
-def generate_create_table_sql(columns, target_conn, source_db_type, target_db_type):
+def generate_create_table_sql(columns, target_conn, source_db_type, target_db_type, table_name):
     # Sort columns by ORDINAL_POSITION
     columns = sorted(columns, key=lambda x: x['ORDINAL_POSITION'])
     
@@ -179,6 +180,11 @@ def generate_create_table_sql(columns, target_conn, source_db_type, target_db_ty
         # Handle default value
         default_value = column['COLUMN_DEFAULT']
         if default_value is not None:
+            print(data_type)
+            # special condition as mysql text type does not support default values
+            if target_db_type == 'mysql' and data_type == 'text':
+                col_def = col_def.replace('TEXT', 'varchar(255)')
+
             col_def += f" DEFAULT {get_default_value_as_per_database_type(source_db_type, target_db_type, target_data_type, default_value)}"
         
         # Handle null/not null constraint
@@ -186,21 +192,27 @@ def generate_create_table_sql(columns, target_conn, source_db_type, target_db_ty
         if is_nullable == 'NO':
             col_def += " NOT NULL"
         else:
-            col_def += " NULL"
+            pass
         
         table_columns.append(col_def)
     
     create_table_sql = (
-        "CREATE TABLE CommonDataTypes (\n"
+        "CREATE TABLE " + table_name + "_new" + "(\n"
         "    " + ",\n    ".join(table_columns) + "\n"
         ");"
     )
     
-    # cursor = target_conn.cursor()
-    # cursor.execute(create_table_sql)
-    # target_conn.commit()
-    # cursor.close()
-    
+    # try:
+    #     cursor = target_conn.cursor()
+    #     cursor.execute(create_table_sql)
+    #     target_conn.commit()
+    #     cursor.close()
+    #     logger.info('Sucessfully created the tbale in target database...')
+    # except Exception as e:
+    #     pass
+    #     logger.info('Error creating the table in target database...')
+    #     logger.info(e)
+
     return create_table_sql
 
 
@@ -214,7 +226,7 @@ def main():
 
     source_db_type = 'mysql'  # Replace with your source database type
     target_db_type = 'postgres'  # Replace with your target database type
-    table_name = 'CommonDataTypes'  # Replace with your table name
+    table_name = 'commondatatypes'  # Replace with your table name
 
     # Define schema mappings based on the database type
     schema_mappings = {
@@ -235,8 +247,10 @@ def main():
     # Get columns from source database
     columns = get_columns(source_conn, source_db_type, table_name, schema_name)
 
+    logger.info(f'Extracted columns from source...{columns}')
+
     # Generate SQL for target database
-    create_table_sql_statement = generate_create_table_sql(columns, target_conn, source_db_type, target_db_type)
+    create_table_sql_statement = generate_create_table_sql(columns, target_conn, source_db_type, target_db_type, table_name)
 
     # Output the CREATE TABLE statement
     logger.info(f"{target_db_type.upper()} CREATE TABLE statement:")
