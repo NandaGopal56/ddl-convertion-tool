@@ -53,7 +53,7 @@ def setup_logger():
 
 def save_ddl_to_file(table_name, source_ddl, target_ddl, source_db_type, target_db_type):
     # Function to save DDL statements to a file
-    filename = f"{table_name}.sql"
+    filename = f"{table_name}_output.sql"
 
     with open(filename, 'w') as f:
         f.write(f"-- DDL for {table_name} from {source_db_type} to {target_db_type}\n")

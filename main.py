@@ -45,6 +45,10 @@ def get_connection(db_type):
         raise ValueError(f"Unsupported database type: {db_type}")
 
 def get_source_ddl(conn, db_type, table_name):
+    '''
+        based on the type of database, it will fetch the DDL statement or create a sample DDL statement using the information schema table and returns a suedo code representation of the ddl statement
+    '''
+
     if db_type == 'mysql':
         cursor = conn.cursor(dictionary=True)
         cursor.execute(f"SHOW CREATE TABLE {table_name}")
@@ -52,13 +56,32 @@ def get_source_ddl(conn, db_type, table_name):
 
     elif db_type == 'postgres':
         cursor = conn.cursor(cursor_factory=DictCursor)
-        cursor.execute("""
-            SELECT column_name, data_type, character_maximum_length, numeric_precision, numeric_scale,
-                   column_default, is_nullable, ordinal_position
-            FROM information_schema.columns
-            WHERE table_schema = %s AND table_name = %s
-        """, (table_name))
-        data = cursor.fetchall()
+        # Query to get the DDL of the table
+        ddl_query = f"""
+                        SELECT
+                            'CREATE TABLE ' || table_name || ' (' ||
+                            array_to_string(
+                                array_agg(
+                                    column_name || ' ' || data_type ||
+                                    coalesce('(' || character_maximum_length || ')', '') ||
+                                    case
+                                        when is_nullable = 'NO' then ' NOT NULL'
+                                        else ''
+                                    end
+                                ), ', '
+                            ) || ');' AS ddl
+                        FROM
+                            information_schema.columns
+                        WHERE
+                            table_schema = 'public' and
+                            table_name = '{table_name}'
+                        GROUP BY
+                            table_name;
+                        """
+
+                        # Execute the query
+        cursor.execute(ddl_query)
+        data = cursor.fetchall()[0][0]
 
     else:
         raise ValueError(f"Unsupported database type: {db_type}")
@@ -67,6 +90,10 @@ def get_source_ddl(conn, db_type, table_name):
     return data
 
 def get_columns(conn, db_type, table_name, schema_name):
+    '''
+    Based on the type of database, it will return all the information about all the columns using the information schema table
+    '''
+
     if db_type == 'mysql':
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
@@ -116,6 +143,7 @@ def map_data_type(source_db_type, target_db_type, data_type):
             logger.info(f'For {data_type} in source, the correspnding datatype in {target_db_type} not found so returning TEXT')
             # If target_db_type not found, return a default value or handle as needed
             return 'TEXT'  # Default to TEXT if no specific mapping found for target DB type
+        
     else:
         logger.info(f'MATCH NOT FOUND in json config for the datatype {data_type}')
         # If data_type not found in mappings, use custom mapping function
@@ -177,11 +205,15 @@ def generate_create_table_sql(columns, target_conn, source_db_type, target_db_ty
         
         col_def = f"{col_name} {target_data_type}"
         
-        if data_type.startswith('varchar') or data_type.startswith('character varying'):
+        if data_type.startswith('varchar') \
+            or data_type.startswith('character varying') \
+            or data_type.startswith('character'):
+
             max_length = column.get('CHARACTER_MAXIMUM_LENGTH') if column.get('CHARACTER_MAXIMUM_LENGTH') else 255
             col_def = f"{col_name} {target_data_type}({max_length})"
 
         elif data_type == 'decimal':
+            
             precision = column['NUMERIC_PRECISION']
             scale = column['NUMERIC_SCALE']
             col_def = f"{col_name} {target_data_type}({precision}, {scale})"
@@ -226,16 +258,7 @@ def generate_create_table_sql(columns, target_conn, source_db_type, target_db_ty
 
 
 
-def main():
-
-    # Specify source and target database types
-    source_db_type = 'postgres'  # Replace with your source database type
-    target_db_type = 'mysql'  # Replace with your target database type
-    table_name = 'commondatatypes'  # Replace with your table name
-
-    # source_db_type = 'mysql'  # Replace with your source database type
-    # target_db_type = 'postgres'  # Replace with your target database type
-    # table_name = 'commondatatypes'  # Replace with your table name
+def main(source_db_type, target_db_type, table_name):
 
     # Define schema mappings based on the database type
     schema_mappings = {
@@ -262,16 +285,28 @@ def main():
     create_table_sql_statement = generate_create_table_sql(columns, target_conn, source_db_type, target_db_type, table_name)
 
     # Output the CREATE TABLE statement
-    logger.info(f"{target_db_type.upper()} CREATE TABLE statement:")
+    logger.info(f"{target_db_type.upper()} CREATE TABLE statement: ")
     logger.info(create_table_sql_statement)
 
+    source_ddl = get_source_ddl(source_conn, source_db_type, table_name)
+
     # source_DDL is passed as none for now as for postgres, this code is not implemented to get the ddl. 
-    save_ddl_to_file(table_name=table_name, source_ddl=None, target_ddl=create_table_sql_statement, source_db_type=source_db_type, target_db_type=target_db_type)
+    save_ddl_to_file(table_name=table_name, source_ddl=source_ddl, target_ddl=create_table_sql_statement, source_db_type=source_db_type, target_db_type=target_db_type)
 
     # Close connections
     source_conn.close()
     target_conn.close()
 
+
 if __name__ == "__main__":
-    main()
+    # Specify source and target database types
+    source_db_type = 'postgres'  # Replace with your source database type
+    target_db_type = 'mysql'  # Replace with your target database type
+    table_name = 'commondatatypes'  # Replace with your table name
+
+    # source_db_type = 'mysql'  # Replace with your source database type
+    # target_db_type = 'postgres'  # Replace with your target database type
+    # table_name = 'commondatatypes'  # Replace with your table name
+
+    main(source_db_type, target_db_type, table_name)
 

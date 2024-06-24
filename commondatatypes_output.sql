@@ -1,6 +1,6 @@
 -- DDL for commondatatypes from postgres to mysql
 -- Source DDL (from postgres):
-None
+CREATE TABLE commondatatypes (col_tinyint smallint NOT NULL, col_smallint smallint, col_int integer NOT NULL, col_bigint bigint, col_boolean smallint, col_decimal numeric, col_float real NOT NULL, col_double double precision, col_date date, col_datetime timestamp without time zone, col_timestamp timestamp without time zone, col_time time without time zone, col_year integer, col_char character(10), col_varchar character varying(255) NOT NULL, col_binary bytea, col_varbinary bytea, col_blob bytea, col_text text, col_enum character varying(50) NOT NULL, col_set character varying);
 
 -- Target DDL (to mysql):
 CREATE TABLE commondatatypes_new(
@@ -17,7 +17,7 @@ CREATE TABLE commondatatypes_new(
     col_timestamp TIMESTAMP DEFAULT '2024-12-31 12:00:00',
     col_time TIME,
     col_year INT,
-    col_char TEXT,
+    col_char VARCHAR(10),
     col_varchar VARCHAR(255) NOT NULL,
     col_binary BLOB,
     col_varbinary BLOB,

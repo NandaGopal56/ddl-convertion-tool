@@ -48,6 +48,10 @@
             "mysql": "VARCHAR",
             "postgres": "CHARACTER VARYING"
         },
+        "character": {
+            "mysql": "VARCHAR",
+            "postgres": "CHARACTER VARYING"
+        },
         "text": {
             "mysql": "TEXT",
             "postgres": "TEXT"
