@@ -158,7 +158,7 @@ def get_default_value_as_per_database_type(source_db_type, target_db_type, targe
             logger.info(f'source is : {source_db_type}, target is {target_db_type}: returning value is {return_value}')
             return return_value
     
-    # default case shuld be as it is. this is error prone. fix it
+    # below default case shuld not be as it is as this can be error prone. fix it with some extra analysis as per db schema
     logger.info(f'source is : {source_db_type}, target is {target_db_type}: returning value is {str(value)}')
     return str(value)
 
@@ -177,13 +177,14 @@ def generate_create_table_sql(columns, target_conn, source_db_type, target_db_ty
         
         col_def = f"{col_name} {target_data_type}"
         
-        if data_type.startswith('varchar'):
-            max_length = column['CHARACTER_MAXIMUM_LENGTH']
-            col_def = f"{col_name} VARCHAR({max_length})"
+        if data_type.startswith('varchar') or data_type.startswith('character varying'):
+            max_length = column.get('CHARACTER_MAXIMUM_LENGTH') if column.get('CHARACTER_MAXIMUM_LENGTH') else 255
+            col_def = f"{col_name} {target_data_type}({max_length})"
+
         elif data_type == 'decimal':
             precision = column['NUMERIC_PRECISION']
             scale = column['NUMERIC_SCALE']
-            col_def = f"{col_name} DECIMAL({precision}, {scale})"
+            col_def = f"{col_name} {target_data_type}({precision}, {scale})"
         
         # Handle default value
         default_value = column['COLUMN_DEFAULT']
@@ -232,9 +233,9 @@ def main():
     target_db_type = 'mysql'  # Replace with your target database type
     table_name = 'commondatatypes'  # Replace with your table name
 
-    source_db_type = 'mysql'  # Replace with your source database type
-    target_db_type = 'postgres'  # Replace with your target database type
-    table_name = 'commondatatypes'  # Replace with your table name
+    # source_db_type = 'mysql'  # Replace with your source database type
+    # target_db_type = 'postgres'  # Replace with your target database type
+    # table_name = 'commondatatypes'  # Replace with your table name
 
     # Define schema mappings based on the database type
     schema_mappings = {

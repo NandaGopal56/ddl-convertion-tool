@@ -41,7 +41,11 @@
             "postgres": "CHARACTER"
         },
         "character varying": {
-            "mysql": "VARCHAR(255)",
+            "mysql": "VARCHAR",
+            "postgres": "CHARACTER VARYING"
+        },
+        "varchar": {
+            "mysql": "VARCHAR",
             "postgres": "CHARACTER VARYING"
         },
         "text": {
